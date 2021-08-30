@@ -8,32 +8,55 @@ const submitInput = () => {
 
 
 // Searched API loading
-const searchedValue = mealName => {
+const searchedValue = async mealName => {
     const url = `https://www.themealdb.com/api/json/v1/1/search.php?s=${mealName}`;
-    fetch(url)
-        .then(res => res.json())
-        .then(data => loadSearchedValue(data.meals))
+    const res = await fetch(url);
+    const data = await res.json();
+    loadSearchedValue(data.meals, mealName);
+    
+    // fetch(url)
+    //     .then(res => res.json())
+    //     .then(data => loadSearchedValue(data.meals, mealName))
 }
 
 // Load Searched Value 
-const loadSearchedValue = meals => {
-    // console.log(meals);
+const loadSearchedValue = (meals, mealName) => {
+    console.log('Meals Array',meals);
     const searchResult = document.getElementById('meals');
-    meals.forEach(meal => {
-        // console.log(meal);
-        const div = document.createElement('div');
-        div.classList.add('col')
-        div.innerHTML = `
-        <div onclick = "mealDetails(${meal.idMeal})" class="card h-100">
-            <img src="${meal.strMealThumb}" class="card-img-top" alt="...">
-            <div class="card-body">
-                <h5 class="card-title">${meal.strMeal}</h5>
-                <p class="card-text">${meal.strInstructions.slice(0,250)}</p>
+    searchResult.textContent = '';
+
+    if(meals == null || mealName == ''){
+
+        const divError = document.getElementById('error-message');
+        divError.textContent = '';
+        divError.style.display = 'block';
+        const p = document.createElement('p');
+        p.classList.add('mx-auto');
+        p.innerText='Invalid Input';
+        divError.appendChild(p);
+        const mealDetails = document.getElementById('meal-details');
+        mealDetails.style.display = 'none';
+    }
+    else{
+        document.getElementById('error-message').style.display = 'none';
+        meals.forEach(meal => {
+            // console.log(meal);
+            const div = document.createElement('div');
+            div.classList.add('col')
+            div.innerHTML = `
+            <div onclick = "mealDetails(${meal.idMeal})" class="card h-100">
+                <img src="${meal.strMealThumb}" class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h5 class="card-title">${meal.strMeal}</h5>
+                    <p class="card-text">${meal.strInstructions.slice(0,250)}</p>
+                </div>
             </div>
-        </div>
-        `;
-        searchResult.appendChild(div);
-    });
+            `;
+            searchResult.appendChild(div);
+        });
+    }
+
+
 }
 
 // load Meal Details
@@ -49,6 +72,8 @@ const mealDetails = mealID =>{
 const displayMealDetail = meal =>{
     console.log(meal);
     const mealDetails = document.getElementById('meal-details');
+    mealDetails.style.display = 'block';
+    mealDetails.textContent = '';
     const div = document.createElement('div');
     div.classList.add('card');
 
